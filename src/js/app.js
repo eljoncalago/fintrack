@@ -26,19 +26,40 @@ export async function refreshData() {
     applyBootstrap(data.data || data);
     setSync('ok');
   } catch (e) {
-    setSync('error');
+    // BUG FIX: Previously only showed "Sync error" text with no details, making
+    // it impossible to diagnose what went wrong. Now the actual error message is
+    // stored as a tooltip on the sync indicator so the user can hover/tap to see
+    // the real error, and it is also logged to the console for easy debugging.
+    console.error('Sync error:', e);
+    setSync('error', e.message || String(e));
     throw e;
   }
 }
 
-function setSync(status) {
+/**
+ * BUG FIX: Added optional `detail` parameter so error messages are surfaced
+ * on the sync dot as a title attribute (hover tooltip) instead of being hidden.
+ */
+function setSync(status, detail) {
   const dot = document.getElementById('sync-dot');
   const label = document.getElementById('sync-label');
   if (!dot) return;
   dot.className = 'sidebar-footer-dot';
-  if (status === 'syncing') { dot.classList.add('syncing'); label.textContent = 'Syncing…'; }
-  else if (status === 'error') { dot.classList.add('error'); label.textContent = 'Sync error'; }
-  else { label.textContent = 'Synced'; }
+  dot.title = '';
+  if (status === 'syncing') {
+    dot.classList.add('syncing');
+    label.textContent = 'Syncing…';
+  } else if (status === 'error') {
+    dot.classList.add('error');
+    // Show a short version in the label and full detail on hover
+    label.textContent = 'Sync error';
+    if (detail) {
+      dot.title = detail;
+      label.title = detail;
+    }
+  } else {
+    label.textContent = 'Synced';
+  }
 }
 
 function buildNav() {
@@ -65,8 +86,14 @@ function bindChrome() {
     document.getElementById('sidebar').classList.remove('open');
   });
   document.getElementById('refresh-btn').addEventListener('click', async () => {
-    try { await refreshData(); toast('Data refreshed.', 'success'); goTo(state.currentView); }
-    catch (e) { toast(e.message, 'error'); }
+    try {
+      await refreshData();
+      toast('Data refreshed.', 'success');
+      goTo(state.currentView);
+    } catch (e) {
+      // Show the full error message in the toast so the user can read it
+      toast('Sync failed: ' + (e.message || String(e)), 'error', 8000);
+    }
   });
 }
 
@@ -96,11 +123,16 @@ async function init() {
         <div class="empty-ico" style="color:var(--error)">⚠</div>
         <div class="empty-title">Could not load your data</div>
         <div class="empty-sub"></div>
+        <details style="margin:12px 0;text-align:left">
+          <summary style="cursor:pointer;font-size:.85em;color:var(--text-soft)">Show technical details</summary>
+          <pre class="empty-detail" style="font-size:.75em;overflow:auto;max-height:120px;padding:8px;background:var(--surface-2);border-radius:6px;margin-top:6px"></pre>
+        </details>
         <button class="btn btn-primary mt-2" id="retry-btn">Retry</button>
       </div>`;
     content.querySelector('.empty-sub').textContent = e.message || 'Check that your Apps Script API URL is set in src/js/config.js and the web app is deployed.';
+    content.querySelector('.empty-detail').textContent = String(e.stack || e);
     content.querySelector('#retry-btn').addEventListener('click', () => init());
-    toast(e.message, 'error', 6000);
+    toast('Sync failed: ' + (e.message || String(e)), 'error', 8000);
   }
 }
 
