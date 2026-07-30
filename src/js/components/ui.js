@@ -2,7 +2,9 @@
    ui.js — Reusable UI components: toast, modal, confirm, loading
    ============================================================ */
 
-import { el, $ } from './utils.js';
+// BUG FIX: was './utils.js' but ui.js lives in src/js/components/,
+// so the correct relative path to utils.js is one level up.
+import { el, $ } from '../utils.js';
 
 /* ---------- Toast ---------- */
 export function toast(message, type = 'info', duration = 3500) {

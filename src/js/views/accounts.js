@@ -226,11 +226,14 @@ export function openAccountDetail(id) {
     const tb = wrap.querySelector('tbody');
     txns.forEach((t) => {
       const tr = el('tr');
+      // BUG FIX: was setting tr.children[3].textContent = t.type which overwrote
+      // the <span class="badge ..."> inside the <td>, losing the badge styling.
+      // Now we set the textContent on the inner <span> directly.
       tr.innerHTML = `<td></td><td></td><td></td><td><span class="badge ${badgeClass(t.type)}"></span></td><td class="tnum"></td><td class="tnum"></td>`;
       tr.children[0].textContent = fmtDate(t.date);
       tr.children[1].textContent = t.description || '';
       tr.children[2].textContent = t.category || '';
-      tr.children[3].textContent = t.type;
+      tr.children[3].querySelector('span').textContent = t.type;
       tr.children[4].textContent = formatMoney(t.amount, t.currency);
       tr.children[4].classList.add(t.type === 'Income' || t.type === 'Deposit' ? 'pos' : 'neg');
       tr.children[5].textContent = formatMoney(t.balanceAfter, t.currency);

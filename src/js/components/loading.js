@@ -2,7 +2,9 @@
    loading.js — Startup loading screen controller
    ============================================================ */
 
-import { $ } from './utils.js';
+// BUG FIX: was './utils.js' but loading.js lives in src/js/components/,
+// so the correct relative path to utils.js is one level up.
+import { $ } from '../utils.js';
 
 const STEPS = [
   'Connecting to server…',

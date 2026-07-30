@@ -3,7 +3,9 @@
    Uses fetch with no-cors fallback handling and JSON POST.
    ============================================================ */
 
-import { CONFIG } from './config.js';
+// BUG FIX: was './config.js' but api.js lives in src/js/api/,
+// so the correct relative path to config.js is one level up.
+import { CONFIG } from '../config.js';
 
 const TOKEN_KEY = 'fintrack_token';
 

@@ -4,7 +4,7 @@
 
 export const CONFIG = {
   // Replace with your Google Apps Script Web App URL (ends with /exec)
-  API_URL: 'https://script.google.com/macros/s/AKfycbyPGbeiLbG4E4lJJhpJ35kNwdkLTA1-lLPhCg9ntGFJDz7F3u45EJ-qu6knTRjJLYXoXg/exec',
+  API_URL: 'https://script.google.com/macros/s/AKfycbxuf_0k5pvBY8hOr8mG5okYGJSR6r1TFinfDN6f5d1o05VvG-zOss2zM50bCX3M2CpeXA/exec',
   COUNTRIES: {
     TH: { code: 'TH', name: 'Thailand', currency: 'THB', symbol: '฿', flag: '🇹🇭' },
     PH: { code: 'PH', name: 'Philippines', currency: 'PHP', symbol: '₱', flag: '🇵🇭' },
